@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Persistodon</title>
+  <link rel="icon" href="https://fav.farm/🦕">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@800&family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    /* JMU Slate Gray: #333333 Ice Blue: #8EE4D7 JMU Purple: #450084 Teal: #009698 JMU Light Gold: #F4EFE1 */
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      font-family: Roboto;
+    }
+
+    main {
+      background-color: #F4EFE1;
+      color: #333;
+      flex-grow: 1;
+      padding: 1rem;
+    }
+
+    aside {
+      border-inline-start: 1rem solid #009698;
+      background-color: #450084;
+      color: #8EE4D7;
+      max-width: 33vw;
+      padding: 1rem;
+    }
+
+    main,
+    aside {
+      overflow-y: scroll;
+    }
+
+    aside a {
+      color: #F4EFE1;
+    }
+
+    aside a:visited {
+      color: #009698;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    h1 {
+      flex-grow: 1;
+    }
+
+    #downloads {
+      display: none;
+    }
+
+    code {
+      background-color: #00000099;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <h1>🦕 Persistodon</h1>
+      <button id="share" type="button">Get Sharable URL</button>
+      <button id="export" type="button">Export</button>
+      <form action="#" id="import-form">
+        <label for="import-file">🦖 Tranportodons</label>
+        <input type="file" name="import-file" id="import-file">
+        <button id="import" type="submit">Import</button>
+      </form>
+    </header>
+    <form id="new-item-form" action="#">
+      <label for="item">New todo item</label>
+      <input type="text" name="item" id="item">
+      <button type="submit">Add</button>
+    </form>
+    <ol id="items"></ol>
+    <div id="downloads"></div>
+  </main>
+  <aside>
+    <section>
+      <h2>Overview</h2>
+      <p>Look at this excellent little TODO app! 🤩 The code as provided implements these features:</p>
+      <ul>
+        <li>Adding items to the todo list</li>
+        <li>listing the new item at the end of the existing to do list items</li>
+        <li><em>persist</em> the todo items to <code>localStorage</code> as they are added to the to do list</li>
+        <li><em>load any todo items from <code>localStorage</code> when the page loads </em></li>
+      </ul>
+    </section>
+    <hr>
+    <section>
+      <p>Know what might be neato? I think it needs MOAR ... 🔔</p>
+      <h2>Part 1: Sharasaurus - <a target="_blank" rel="noopener noreferrer"
+          href="https://en.wiktionary.org/wiki/persistence">persistence
+          /pəˈsɪst(ə)ns/</a></h2>
+      <p>How couuld we view the same list on our phone as we are viewing on our laptop? Share the list with a friend?
+      </p>
+      <p>(Part 1 should have been completed as your previous lab activity)</p>
+      <h3>TODO</h3>
+      <p>There are <code>// TODO</code> comments in the javascript to guide you in your way while you add these
+        features:</p>
+      <ol>
+        <li>Modify the existing <code>Get Sharable URL</code> button so that it updates the url so that all of the todo
+          items currently stored in <code>localStorage</code> are encoded in the <code>query string</code> in the
+          browser's address
+          bar.</li>
+        <li>Modify the existing code to notice it was passed a query string and to populate <code>localStorage</code>
+          initially with
+          the items in the query string</li>
+      </ol>
+    </section>
+    <hr>
+    <section>
+      <h2>Part 2: Transportodon</h2>
+      <p>What if there's more state in localStorage that will fit in a URL, or what if we would like to backup the state
+        of our data in the app? Let's add a feature to export the data in localStorage as a file that can be downloaded
+        and that can also be imported back into the app on the same or different browser (or computer) to repopulate the
+        app's state from the file's data.</p>
+      <h3>TODO</h3>
+      <p>There are <code>// TODO</code> comments in the javascript to guide you in your way while you add these
+        features:</p>
+      <ol>
+        <li>Modify the existing <code>Export</code> button so that it downloads a JSON file that encodes all of the todo
+          items currently stored in <code>localStorage</code>.</li>
+        <li>Modify the existing <code>Import</code> button so that it causes the file selected in the <code>file field</code> to be read and to populate <code>localStorage</code> with
+          the items read from the file</li>
+      </ol>
+    </section>
+  </aside>
+  <script>
+    // get the DOM elements
+    const form = document.getElementById('new-item-form')
+    const input = document.getElementById('item')
+
+    function addItemToList(item) {
+      const list = document.getElementById('items')
+      const newLi = document.createElement('li')
+      newLi.textContent = item;
+      list.append(newLi)
+    }
+
+    function clearList() {
+      console.log('clearList')
+      document.getElementById('items').innerHTML = '';
+    }
+
+    function populateFromLocalStorage() {
+      console.log('populateFromLocalStorage')
+      clearList()
+      //handle loading from localStorage
+      const items = localStorage.getItem('items');
+      if (items) {
+        JSON.parse(items).forEach(addItemToList)
+      }
+    }
+
+    //handle form persisting to localStorage
+
+    form.addEventListener('submit', (ev) => {
+      console.log('form submitted')
+      ev.preventDefault()
+      addItemToList(input.value);
+      // const items = 
+      localStorage.setItem('items', JSON.stringify([...JSON.parse(localStorage.getItem('items') ?? '[]'), input.value]))
+      input.value = ''
+    })
+
+    // get url
+    const shareButton = document.getElementById('share')
+    shareButton.addEventListener('click', (ev) => {
+      console.log('share button was clicked')
+      // TODO redirect to a sharable link by completing the steps below
+
+      // 1. get the current state from localStorage
+
+      // 2. create a URLSearchParams object from the data you retrieved from localStorage
+
+      // 3. get the current url from window.location
+
+      // 4. set the current url's search property to '?' concatenated with: the urlsearchparams object's tostring 
+
+      // 5. update the window.location to the result of the preceding step
+    })
+
+    function populateLocalStorageFromURLSeach() {
+      console.log('populateLocalStorageFromURLSeach')
+      // TODO update from URL by completing the steps below:
+      // 1. when the page loads, look to see if the url has a querystring that has the kind of data you added to it above
+      // 2. if there is such data in the querystring, replace the state in localStorage with the data in the URL
+    }
+
+    // initialize the page
+    function init() {
+      console.log('initialize the page')
+      populateLocalStorageFromURLSeach()
+      populateFromLocalStorage()
+      document.getElementById('export').addEventListener('click', exportClick)
+      document.getElementById('import-form').addEventListener('submit', onImport)
+    }
+
+    function exportClick(ev) {
+      // TODO add a feature to create "transportodons" (export the current
+      // todo items as a json file) by completing the steps below:
+
+      // TODO 1. get the current state from localStorage
+      // I wanted mine to be an object with a single key (items) and then a parsed representation of the value from localStorage
+
+      // TODO 2. get the stringified version of the state from the previous step
+
+      // TODO 3. encode the state as a URI component
+
+      // TODO 4. prepend the encoded string with the data URL dark magic:
+      // 'data:application/json;charset=utf-8,'
+      // ok, it's not really dark magic, read more here:
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs
+
+      // TODO 5. create a link which has as its href the result from the preceding step and its download attribute set to
+      // "transportodons.json"
+
+      // TODO 6. add the link to the downloads container in the provided html
+
+      // TODO 7. write the javascript to click the newly added link
+    }
+
+    // when the import form is submitted...
+    function onImport(ev) {
+      ev.preventDefault()
+      console.log('import form was submitted')
+      // TODO add a feature to import the todo items (or "transportodons") that were previously exported by this app by
+      // completing the steps below: 
+
+      // get a reference to the file field
+      const importField = document.getElementById('import-file')
+
+      // TODO 1. get the list of file objects selected by the user
+
+      // TODO 2. if there aren't any, alert a helpful message
+
+      // TODO 3. if there was at least 1 file, proceed with only the first file
+
+      // TODO 4. construct a new FileReader object
+
+      // TODO 5. add an event listener for the new FileReader's load event that will call the loadedJSON function below
+
+      // TODO 6. tell the filereader to read the file as text https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsText
+    }
+
+    // callback for when the json file is loaded during import
+    function loadedJSON(ev) {
+      // TODO 7. get the event's target's result
+
+      // TODO 8. decode the result (recall that it was encoded for use as a URL during export above)
+
+      // TODO 9. the decoded value should be a JSON string, parse it.
+
+      // TODO 10. add the items from the parsed object into localstorage
+
+      // update the list of todos based on the newly populated state in localStorage
+      populateFromLocalStorage()
+    }
+
+
+    init()
+
+  </script>
+</body>
+
+</html>
