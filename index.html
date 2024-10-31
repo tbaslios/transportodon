@@ -190,13 +190,31 @@
       // 4. set the current url's search property to '?' concatenated with: the urlsearchparams object's tostring 
 
       // 5. update the window.location to the result of the preceding step
-    })
+      const items = JSON.parse(localSotrage.getItem('items'));
+      const params = new URLSearchParams();
+      currentState.forEach((item, index)=> {
+        params.append(`item${index}`, item);
+      });
+      const currentUrl = window.location.href;
+      const updatedUrl = `${currentUrl.split('?')[0]}?${params.toString()}`;
+      window.location.href=updatedUrl;
+    });
 
     function populateLocalStorageFromURLSeach() {
       console.log('populateLocalStorageFromURLSeach')
       // TODO update from URL by completing the steps below:
       // 1. when the page loads, look to see if the url has a querystring that has the kind of data you added to it above
       // 2. if there is such data in the querystring, replace the state in localStorage with the data in the URL
+      const params = new URLSearchParams(window.location.search);
+      const urlItems = [];
+      for (let [key,urlValue] of params.entries()) {
+        if (key.startsWith('item')) {
+          items.push(urlValue);
+        }
+      }
+      if (urlItems.length > 0) {
+        localStorage.setItem('items', JSON.stringify(items));
+      }
     }
 
     // initialize the page
@@ -214,22 +232,29 @@
 
       // TODO 1. get the current state from localStorage
       // I wanted mine to be an object with a single key (items) and then a parsed representation of the value from localStorage
+      const items = JSON.parse(localStorage.getItem('items'));
 
       // TODO 2. get the stringified version of the state from the previous step
-
+      const stringify = JSON.stringify(state);
       // TODO 3. encode the state as a URI component
-
+      const encodedState = encodeURIComponent(stringify);
       // TODO 4. prepend the encoded string with the data URL dark magic:
       // 'data:application/json;charset=utf-8,'
       // ok, it's not really dark magic, read more here:
       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs
+      const dataUrl = 'data:application/json;charset=utf-8,' + encodedData;
 
       // TODO 5. create a link which has as its href the result from the preceding step and its download attribute set to
       // "transportodons.json"
+      const downloadLink = dociment.createElement('a');
+      downloadedLink.href = dataUrl;
+      downloadLink.download = 'transportodons.json';
 
       // TODO 6. add the link to the downloads container in the provided html
-
+      const downloadContainer = document.getElementById('downloads');
+      downloadsContainer.appendChild(downloadLink);
       // TODO 7. write the javascript to click the newly added link
+      downloadLink.click();
     }
 
     // when the import form is submitted...
@@ -243,28 +268,34 @@
       const importField = document.getElementById('import-file')
 
       // TODO 1. get the list of file objects selected by the user
-
+      const userFiles = importField.files;
       // TODO 2. if there aren't any, alert a helpful message
-
+      if (userFiles.length === 0) {
+        alert('No Files Found');
+        return;
+      }
       // TODO 3. if there was at least 1 file, proceed with only the first file
-
+      const userFile = files[0];
       // TODO 4. construct a new FileReader object
-
+      const fileReader = new FileReader();
       // TODO 5. add an event listener for the new FileReader's load event that will call the loadedJSON function below
-
+      fileReader.onload = (event)=> {
+        loadedJSON(event.target.result);
+      };
       // TODO 6. tell the filereader to read the file as text https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsText
+      fileReader.readAsText(userFile);
     }
 
     // callback for when the json file is loaded during import
     function loadedJSON(ev) {
       // TODO 7. get the event's target's result
-
+      const targetResult = ev.target.result;
       // TODO 8. decode the result (recall that it was encoded for use as a URL during export above)
-
+      const decodedResult = decodeURIComponent(targetResult);
       // TODO 9. the decoded value should be a JSON string, parse it.
-
+      const parsedValue = JSON.parse(decodedResult);
       // TODO 10. add the items from the parsed object into localstorage
-
+      localStorage.setItem('items', JSON.stringify(parsedValue.items));
       // update the list of todos based on the newly populated state in localStorage
       populateFromLocalStorage()
     }
