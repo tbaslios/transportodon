@@ -145,8 +145,8 @@
     function addItemToList(item) {
       const list = document.getElementById('items')
       const newLi = document.createElement('li')
-      newLi.textContent = item;
-      list.append(newLi)
+      newLi.textContent = `${item.name}: ${item.description}`;
+      list.appendChild(newLi);
     }
 
     function clearList() {
@@ -191,14 +191,14 @@
       // 4. set the current url's search property to '?' concatenated with: the urlsearchparams object's tostring 
 
       // 5. update the window.location to the result of the preceding step
-      const items = localStorage.items ?? '[]';
+      const items = localStorage.getItem('items') ?? '[]';
       const itemArray = JSON.parse(items);
       const params = new URLSearchParams({ items: JSON.stringify(itemArray) });
       const itemsObj = {
         items: itemArray
       };
-      const currentUrl = window.location.href;
-      const updatedUrl = `${currentUrl.split('?')[0]}?${params.toString()}`;
+      const currentUrl = window.location.href.split('?')[0];
+      const updatedUrl = `${currentUrl}${params.toString()}`;
       window.location.href=updatedUrl;
     });
 
